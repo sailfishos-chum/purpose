@@ -11,6 +11,7 @@ License: GPLv2 or GPLv3
 URL:     https://invent.kde.org/frameworks/%{framework}
 Source0:        %{name}-%{version}.tar.bz2
 
+%global __requires_exclude ^[libPhabricatorHelpers|libReviewboardHelpers].*$
 %{?opt_kf5_default_filter}
 
 BuildRequires:  opt-extra-cmake-modules >= %{kf5_version}
