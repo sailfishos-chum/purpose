@@ -1,20 +1,22 @@
-%global kf5_version 5.104.0
+%global kf5_version 5.107.0
 
 Name: opt-kf5-purpose
 Summary: Framework for providing abstractions to get the developer's purposes fulfilled
-Version: 5.104.0
+Version: 5.107.0
 Release: 1%{?dist}
 
 # KDE e.V. may determine that future GPL versions are accepted
 # most files LGPLv2+, configuration.cpp is KDE e.V. GPL variant
 License: GPLv2 or GPLv3
-URL:     https://invent.kde.org/frameworks/purpose
+URL:     https://invent.kde.org/frameworks/%{framework}
+Source0:        %{name}-%{version}.tar.bz2
 
-Source0: %{name}-%{version}.tar.bz2
+%{?opt_kf5_default_filter}
 
-BuildRequires: opt-extra-cmake-modules >= %{kf5_version}
-BuildRequires: gettext
-BuildRequires: intltool
+BuildRequires:  opt-extra-cmake-modules >= %{kf5_version}
+BuildRequires:  opt-kf5-rpm-macros
+BuildRequires:  gettext
+BuildRequires:  intltool
 
 BuildRequires: opt-kf5-rpm-macros
 BuildRequires: opt-kf5-kconfig-devel >= %{kf5_version}
@@ -22,23 +24,9 @@ BuildRequires: opt-kf5-kcoreaddons-devel >= %{kf5_version}
 BuildRequires: opt-kf5-ki18n-devel >= %{kf5_version}
 BuildRequires: opt-kf5-kio-devel >= %{kf5_version}
 BuildRequires: opt-kf5-kirigami2-devel >= %{kf5_version}
-
-BuildRequires: cmake(KF5Kirigami2)
-
-# optional sharefile plugin
-BuildRequires: cmake(KF5KIO)
-BuildRequires: cmake(KF5Notifications)
-
-BuildRequires: pkgconfig(Qt5Network)
-BuildRequires: pkgconfig(Qt5Qml)
-
-%if 0%{?fedora} || 0%{?rhel} > 7
-BuildRequires: kaccounts-integration-devel
-# runtime dep?
-BuildRequires: kde-connect
-BuildRequires: pkgconfig(accounts-qt5)
-BuildRequires: pkgconfig(libaccounts-glib)
-%endif
+BuildRequires: opt-kf5-knotifications-devel >= %{kf5_version}
+BuildRequires: opt-qt5-qtbase-devel
+BuildRequires: opt-qt5-qtdeclarative-devel
 
 %description
 Purpose offers the possibility to create integrate services and actions on
@@ -54,10 +42,8 @@ Requires: cmake(KF5CoreAddons)
 %description devel
 %{summary}.
 
-
 %prep
 %autosetup -n %{name}-%{version}/upstream -p1
-
 
 %build
 export QTDIR=%{_opt_qt5_prefix}
@@ -66,7 +52,8 @@ touch .git
 mkdir -p build
 pushd build
 
-%_opt_cmake_kf5 ../
+%_opt_cmake_kf5 ../ \
+  -DKDE_INSTALL_LIBEXECDIR=%{_opt_kf5_libexecdir}
 %make_build
 
 popd
@@ -86,26 +73,22 @@ rm -fv %{buildroot}%{_datadir}/icons/hicolor/*/actions/kipiplugin_youtube.png
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%files -f %{name}.lang
+%files
 %doc README.md
 %license LICENSES/*.txt
+%{_opt_kf5_datadir}/locale/
 %{_opt_kf5_datadir}/qlogging-categories5/purpose.*
 %{_opt_kf5_libdir}/libKF5Purpose.so.5*
 %{_opt_kf5_libdir}/libKF5PurposeWidgets.so.5*
 %{_opt_kf5_libdir}/libPhabricatorHelpers.so.5*
 %{_opt_kf5_libdir}/libReviewboardHelpers.so.5*
-%{_opt_kf5_libexecdir}/purposeprocess
+%{_opt_kf5_libexecdir}/kf5/purposeprocess
 %{_opt_kf5_datadir}/purpose/
-%{_opt_kf5_plugindir}/purpose/
-%dir %{_opt_kf5_plugindir}/kfileitemaction/
-%{_opt_kf5_plugindir}/kfileitemaction/sharefileitemaction.so
+%{_opt_qt5_plugindir}/kf5/purpose/
+%dir %{_opt_qt5_plugindir}/kf5/kfileitemaction/
+%{_opt_qt5_plugindir}/kf5/kfileitemaction/sharefileitemaction.so
 %{_opt_kf5_qmldir}/org/kde/purpose/
-# this conditional may require adjusting too (e.g. wrt %%twitter)
-%if 0%{?fedora} || 0%{?rhel} > 7
-%{_opt_kf5_datadir}/accounts/services/kde/google-youtube.service
-%{_opt_kf5_datadir}/accounts/services/kde/nextcloud-upload.service
-%endif
-%{_datadir}/icons/hicolor/*/apps/*-purpose.*
+%{_opt_qt5_datadir}/icons/hicolor/*/apps/*-purpose.*
 #{_datadir}/icons/hicolor/*/actions/google-youtube.*
 
 %files devel
