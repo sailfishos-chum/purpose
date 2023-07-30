@@ -1,8 +1,8 @@
-%global kf5_version 5.107.0
+%global kf5_version 5.108.0
 
 Name: opt-kf5-purpose
 Summary: Framework for providing abstractions to get the developer's purposes fulfilled
-Version: 5.107.0
+Version: 5.108.0
 Release: 1%{?dist}
 
 # KDE e.V. may determine that future GPL versions are accepted
